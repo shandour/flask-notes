@@ -1,0 +1,6 @@
+env.sh
+*.*~
+*.pyc
+local_settings.py
+__pycache__/
+task.txt
