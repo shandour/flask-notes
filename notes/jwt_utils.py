@@ -2,7 +2,8 @@ import jwt
 from functools import wraps
 
 from .models import User
-from flask import request, abort, g, current_app as app
+from flask import request, g, current_app as app, jsonify
+from sqlalchemy.orm.exc import NoResultFound
 
 
 def jwt_required(view_func):
@@ -16,7 +17,7 @@ def jwt_required(view_func):
         authenticated = False
 
         if not header:
-            abort(401)
+            return jsonify({'errors': 'Authorization header missing'}), 401
 
         token = header.split()[1]
         try:
@@ -26,11 +27,14 @@ def jwt_required(view_func):
             if user:
                 authenticated = True
                 g.user = user
-        except Exception as e:
-            pass
+        except jwt.ExpiredSignatureError:
+            return jsonify({'errors': 'Signature expired'}), 400
+        except NoResultFound:
+            return jsonify({'errors': 'User does not exists'}), 404
 
         if authenticated:
             return view_func(*args, **kwargs)
         else:
-            abort(401)
+            return jsonify({'errors': 'Authorization failed'}), 401
+
     return decorated

@@ -1,8 +1,8 @@
 import click
 
 from notes.models import db
-from notes import create_app
-from wsgi import app
+from app import app
+
 
 @app.cli.command()
 @click.confirmation_option(

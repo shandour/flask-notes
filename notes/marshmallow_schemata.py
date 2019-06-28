@@ -10,13 +10,13 @@ from marshmallow import (
 from passlib.hash import argon2
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app
-
 import jwt
 
 from .models import User
 
 
 class NoteSchema(Schema):
+    id = fields.UUID()
     title = fields.String(validate=validate.Length(max=200))
     content = fields.String(required=True, validate=validate.Length(min=1))
 
@@ -25,11 +25,9 @@ class NoteSchema(Schema):
         super().__init__(*args, **kwargs)
 
     @post_load
-    def generate_token(self, data, **kwargs):
+    def inject_user_id(self, data, **kwargs):
         if self.user:
             data['user_id'] = self.user.id
-
-        return data
 
 
 class AuthMixin(Schema):
@@ -46,6 +44,11 @@ class RegisterSchema(AuthMixin):
             raise ValidationError('Username already taken')
 
         return value
+
+    @post_load
+    def make_user(self, data, **kwargs):
+        return User(username=data['username'],
+                    password=argon2.hash(data['password']))
 
 
 class LoginSchema(AuthMixin):
@@ -87,3 +90,4 @@ class LoginSchema(AuthMixin):
         ).decode('utf-8')
 
         return data
+
