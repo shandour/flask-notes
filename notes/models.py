@@ -7,13 +7,6 @@ from sqlalchemy.dialects.postgresql import UUID
 
 db = SQLAlchemy()
 
-#notes_users = db.Table(
- #   'notes_users',
-  #  db.Column('user_id', db.Integer, db.ForeignKey('users.id'),
-   #           primary_key=True),
-    #db.Column('note_id', UUID, db.ForeignKey('notes.id'),
-     #         primary_key=True))
-
 
 class Note(db.Model):
     __tablename__ = 'notes'
