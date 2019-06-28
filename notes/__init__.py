@@ -2,7 +2,7 @@
 from flask import Flask
 
 
-def create_app(settings_module='notes.settings', init_celery_required=True):
+def create_app(settings_module='notes.settings'):
     app = Flask(__name__)
     app.config.from_object(settings_module)
     if not app.testing:
